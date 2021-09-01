@@ -1,0 +1,93 @@
+import math
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--type')
+parser.add_argument('--principal', type=int)
+parser.add_argument('--periods', type=int)
+parser.add_argument('--interest', type=float)
+parser.add_argument('--payment', type=int)
+args = parser.parse_args()
+values = str(vars(args).values())
+type_payment = args.type
+principal = args.principal
+periods = args.periods
+interest = args.interest
+payment = args.payment
+
+def n(p, a, il):  # for number of monthly payments
+
+    i = il / (12 * 100)
+    nmp = math.log(a / (a - i * p), 1 + i)
+    nmp = math.ceil(nmp)
+    years = nmp // 12
+    months = nmp - years * 12
+
+    if years == 1:
+        y = 'year'
+    else:
+        y = 'years'
+    if months == 1:
+        m = 'month'
+    else:
+        m = 'months'
+    if months == 0:
+        print(f'It will take {years} {y} to repay this loan!')
+    elif years == 0:
+        print(f'It will take and {months} {m} to repay this loan!')
+    else:
+        print(f'It will take {years} {y} and {months} {m} to repay this loan!')
+    print('Overpayment =', nmp * a - p)
+
+def a(p, n, il):  # for annuity monthly payment amount
+
+    i = il / (12 * 100)
+    annuity = p * (i * (pow(1 + i, n)) / (pow(1 + i, n) - 1))
+    annuity = math.ceil(annuity)
+    print(f'Your annuity payment = {annuity}!')
+    print('Overpayment =', annuity * n - p)
+
+def p(a, n, il):  # for loan principal:
+
+    i = il / (12 * 100)
+    principal = a / ((i * (pow(1 + i, n))) / (pow(1 + i, n) - 1))
+    principal = math.floor(principal)
+    print(f'Your loan principal = {principal}!')
+    print('Overpayment =', a * n - principal)
+
+def d(p, n, il):  # calculating differentiated payments
+    i = il / (12 * 100)
+    sum = 0
+    for m in range(n):
+        differentiated = math.ceil(p / n + i * (p - p * (m + 1 - 1) / n))
+        print(f'Month {m + 1} = {differentiated}')
+        m += 1
+        sum += differentiated
+    print()
+    print(f'Overpayment = {sum - p}')
+
+if type_payment != 'annuity' and type_payment != 'diff':
+    print('Incorrect parameters')
+
+elif type_payment == 'diff' and payment != None:
+    print('Incorrect parameters')
+
+elif interest == None:
+    print('Incorrect parameters')
+
+elif values.count('None') > 1:
+    print('Incorrect parameters')
+
+elif values.count('-') > 0:
+    print('Incorrect parameters')
+
+else:
+    if type_payment == 'annuity':
+        if periods == None:
+            n(principal, payment, interest)
+        elif payment == None:
+            a(principal, periods, interest)
+        elif principal == None:
+            p(payment, periods, interest)
+    if type_payment == 'diff':
+        d(principal, periods, interest)
